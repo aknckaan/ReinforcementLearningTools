@@ -166,6 +166,9 @@ class RL_Model:
 
 						writer.add_scalars("Policy loss", additional_params, cur_episode)
 						writer.add_scalar('Policy loss', np.mean(total_loss), cur_episode)
+				
+				if cur_episode %10==0:
+					torch.save(self.agent.state_dict(), "saved_models/{}_agent_on_{}_epoc{}.pt".format(self.agent.__class__.__name__, self.env.unwrapped.spec.id, cur_episode))
 
 				if cur_episode == 1: 
 					self.agent.eval() 
