@@ -20,3 +20,38 @@ python3 test.py --env=gym_environment_name --model=model_name --step=1000 --epis
 | `--episode` | Number of episodes before terminating the environment. | Any int. |
 | `--batch` | Number of samples in the training batch. | Any int. |
 | `--log` | Save the stats for training proccess. | Boolean |
+
+## Future Work
+
+### Algorithms
+
+Algorithms that will be added in the future
+
+| Algorithms |
+| --- |
+| Encoders |
+| Variational Encoders |
+| DQN |
+| PPO |
+| A3C |
+| Soft A2C |
+| Residual RL |
+
+### Functionality
+
+Functionalities that will be added in the future.
+
+| Functionality |
+| --- |
+| More control over network shape or loss function |
+| More variaty of layers. |
+| Recoding videos and capturing photos during the training. |
+| Paralel environments and data pooling. |
+
+### Other Training Methods
+
+| Training methods |
+| --- |
+| Genetic Algorithms |
+| NEAT |
+| Evolutionary Strategies. |
