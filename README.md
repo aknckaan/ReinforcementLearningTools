@@ -1,5 +1,5 @@
 # ReinforcementLearningTools
-This is a library that I am building during my free time. Currenlty the training algorithm has some bugs and doesn't work. Will be patched soon. 
+This is a Pytorch library that I am building during my free time. (Sample runs will be added soon)
 
 ## Tools
 Currently only implemented algorithm is A2C. The library works on openAI gym environments. 
