@@ -3,54 +3,10 @@ from torch import nn
 from torch import distributions
 import numpy as np
 import torch.nn.functional as F
-class Linear_layer(nn.Module):
+from ReinforcementLearning.components import Linear_layer
+from ReinforcementLearning.components import Conv_layer
+from ReinforcementLearning.components import Variational_layer
 
-	def __init__(self, in_size, out_size, **kwargs):
-
-		super(Linear_layer, self).__init__()
-		
-
-		if 'activation' in kwargs:
-			self.lin = nn.Sequential( nn.Linear(in_size, out_size), getattr(nn, kwargs["activation"])())
-		else:
-			self.lin = nn.Sequential( nn.Linear(in_size, out_size))
-
-	def forward(self, x):
-		return self.lin(x)
-		
-
-
-class Conv_layer(nn.Module):
-
-	def __init__(self, input_channels, output_channels, stride, kernel_size, padding,input_shape,name=""):
-		super(Conv_layer, self).__init__()
-		self.conv =nn.Conv2d(input_channels, output_channels, kernel_size= kernel_size, padding=padding, stride=stride)
-		nn.init.xavier_normal_(self.conv.weight)
-		self.bn= nn.BatchNorm2d(output_channels)	
-		self.relu= nn.ReLU()
-		self.output_size=self.conv_output_shape(tuple(input_shape), kernel_size = kernel_size, stride = stride, pad = padding )
-
-	def forward(self, x):
-		out = self.relu( self.bn(self.conv(x)))
-		return out
-
-	def conv_output_shape(self, h_w, kernel_size=1, stride=1, pad=0, dilation=1):
-
-		if type(h_w) is not tuple:
-			h_w = (h_w, h_w)
-
-		if type(kernel_size) is not tuple:
-			kernel_size = (kernel_size, kernel_size)
-
-		if type(stride) is not tuple:
-			stride = (stride, stride)
-
-		if type(pad) is not tuple:
-			pad = (pad, pad)
-
-		h = (h_w[0] + (2 * pad[0]) - (dilation * (kernel_size[0] -1)) - 1)// stride[0] + 1
-		w = (h_w[1] + (2 * pad[1]) - (dilation * (kernel_size[1] -1)) - 1)// stride[1] + 1
-		return h,w
 
 class Conv_net(nn.Module):
 	def __init__(self, color_channels, kernel_size, stride,input_shape, padding):
@@ -69,55 +25,6 @@ class Conv_net(nn.Module):
 		out = self.conv2(self.conv1(x))
 
 		return out.view(-1, self.n_neurons_in_middle_layer)
-
-
-class Variational_layer(nn.Module):
-	def __init__(self, in_size, out_size, **kwargs):
-
-		super(Variational_layer, self).__init__()
-
-		self.normal = False
-
-		if 'distribution_type' in kwargs:
-			self.dist = getattr(distributions, kwargs["distribution_type"])
-
-			if kwargs["distribution_type"] == "Categorical":
-				self.mu = Linear_layer(in_size, out_size, activation = "Softmax")
-
-				
-
-			else:
-				self.dist = getattr(distributions, "Normal")
-				self.mu = Linear_layer(in_size, out_size, activation = "Tanh")
-
-				self.var = Linear_layer(in_size, out_size, activation = "Softplus")
-
-				self.normal = True
-
-		else:
-			self.mu = Linear_layer(in_size, out_size, activation = "Tanh")
-
-
-
-	def forward(self, x):
-
-		if self.normal:
-
-			x_mu = self.mu(x) 
-			x_var = self.var(x)
-
-			fitted_dist=self.dist(x_mu, x_var)
-
-		else:
-			x = self.mu(x)	
-			fitted_dist=self.dist(x)
-
-
-		action = fitted_dist.sample()
-		log_prob = fitted_dist.log_prob(action)
-		entropy = fitted_dist.entropy()
-
-		return action, log_prob, entropy
 			
 
 class A2C(nn.Module):
@@ -187,11 +94,28 @@ class A2C(nn.Module):
 
 		advantage = Qvals - values
 		actor_loss = (-1* log_probs *  advantage)
-		# critic_loss = 0.5 * advantage.pow(2).mean()
-		critic_loss = 0.5*F.mse_loss( values, Qvals)
+		critic_loss = 0.5 * advantage.pow(2).mean()
+		# critic_loss = 0.5*F.mse_loss( values, Qvals)
 		ac_loss = actor_loss + critic_loss + 0.001 * entropy_term
 
-		return actor_loss.mean(), [actor_loss, critic_loss]
+		return ac_loss.mean(), [actor_loss, critic_loss]
+
+class Random_Agent(nn.Module):
+	def __init__(self, input_size, output_size, kwargs ):
+		super(Random_Agent, self).__init__()
+		self.output_size = output_size
+		self.distribution_type = kwargs["distribution_type"]
+
+	def forward(self,x):
+
+		if self.distribution_type == "Categorical": 
+			action = distributions.Categorical(torch.Tensor(self.output_size)).sample()
+		else: 
+			action = distributions.Normal(torch.Tensor(self.output_size),torch.Tensor(self.output_size)).sample()
+
+			
+		return action
+
 
 class ANN(nn.Module):
 	def __init__(self, input_size, output_size, kwargs ):

@@ -6,7 +6,7 @@ def main():
 
 	parser = argparse.ArgumentParser(description='RL algorithms test.')
 
-	parser.add_argument('--env',type=str,  default="CartPole-v2", help="Target environment.")
+	parser.add_argument('--env',type=str,  default="LunarLander-v2", help="Target environment.")
 	parser.add_argument('--episode', type=int, default=1000, help='Maximum number of episodes to run.')
 	parser.add_argument('--step', type=int, default=10000, help='Maximum number of steps in one episode. Default is 10000.')
 	parser.add_argument('--model', type=str, default="A2C", help='Model to run at the target environment. Default is A2C')

@@ -1,2 +1,4 @@
 from ReinforcementLearning.model import *
 from ReinforcementLearning.Training import RL_Model
+from ReinforcementLearning.Training import AE_Model
+from ReinforcementLearning import components
