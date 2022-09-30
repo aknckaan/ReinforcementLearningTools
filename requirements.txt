@@ -7,7 +7,7 @@ e==1.4.5
 future==0.18.2
 gym==0.17.1
 -e git+https://github.com/xc-jp/InsertionAI.git@bbb9bfbeb6934b1ab7caed9c39c0d6b6eab11e87#egg=gym_insertion&subdirectory=gym-insertion
-joblib==0.14.1
+joblib==1.2.0
 kaptan==0.5.12
 kiwisolver==1.2.0
 libtmux==0.8.2
